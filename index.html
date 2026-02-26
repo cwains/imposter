@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pass The Phone - Imposter Game</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 12px 18px;
+    margin: 6px;
+    border: none;
+    border-radius: 10px;
+    background: #2e86ff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+#rolePopup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.popupContent {
+    background: #222;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.closeBtn {
+    margin-top: 20px;
+    background: crimson;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>Pass The Phone</h1>
+
+<p>How many players?</p>
+<input type="number" id="playerCount" min="2" max="10" value="4">
+<br>
+<button onclick="startGame()">Start Game</button>
+<button onclick="resetGame()">Reset</button>
+
+<div id="playerButtons"></div>
+
+<div id="rolePopup">
+    <div class="popupContent">
+        <h2 id="roleText"></h2>
+        <button class="closeBtn" onclick="closeRole()">X Close</button>
+    </div>
+</div>
+
+<script>
+const words = [
+    "Pizza", "Beach", "Tiger", "School", "Jail",
+    "Airplane", "Zombie", "Castle", "iPhone", "Basketball"
+];
+
+let roles = [];
+let revealed = [];
+let currentPlayer = null;
+
+function startGame() {
+    const count = parseInt(document.getElementById("playerCount").value);
+    const container = document.getElementById("playerButtons");
+    container.innerHTML = "";
+
+    roles = [];
+    revealed = [];
+
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    const imposterIndex = Math.floor(Math.random() * count);
+
+    for (let i = 0; i < count; i++) {
+        if (i === imposterIndex) {
+            roles.push("IMPOSTER 😈");
+        } else {
+            roles.push("Word: " + randomWord);
+        }
+        revealed.push(false);
+    }
+
+    for (let i = 0; i < count; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = "Player " + (i + 1);
+        btn.onclick = () => revealRole(i, btn);
+        container.appendChild(btn);
+    }
+}
+
+function revealRole(index, button) {
+    if (revealed[index]) return;
+
+    currentPlayer = index;
+    document.getElementById("roleText").textContent = roles[index];
+    document.getElementById("rolePopup").style.display = "flex";
+}
+
+function closeRole() {
+    if (currentPlayer !== null) {
+        revealed[currentPlayer] = true;
+        document.querySelectorAll("#playerButtons button")[currentPlayer].disabled = true;
+    }
+    document.getElementById("rolePopup").style.display = "none";
+}
+
+function resetGame() {
+    roles = [];
+    revealed = [];
+    currentPlayer = null;
+    document.getElementById("playerButtons").innerHTML = "";
+}
+</script>
+
+</body>
+</html>
