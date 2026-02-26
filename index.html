@@ -21,7 +21,6 @@ body {
 
 h1 {
     font-weight: 600;
-    margin-bottom: 5px;
 }
 
 .card {
@@ -29,7 +28,7 @@ h1 {
     backdrop-filter: blur(10px);
     padding: 20px;
     border-radius: 20px;
-    max-width: 400px;
+    max-width: 420px;
     margin: 20px auto;
     box-shadow: 0 0 25px rgba(0,0,0,0.4);
 }
@@ -47,7 +46,7 @@ input {
 
 button {
     padding: 12px 18px;
-    margin: 6px;
+    margin: 6px 4px;
     border-radius: 12px;
     border: none;
     font-weight: 600;
@@ -60,7 +59,17 @@ button {
     color: white;
 }
 
-.primary:hover {
+.secondary {
+    background: #2ecc71;
+    color: white;
+}
+
+.danger {
+    background: crimson;
+    color: white;
+}
+
+button:hover {
     transform: scale(1.05);
 }
 
@@ -93,11 +102,11 @@ button {
     border-radius: 25px;
     width: 80%;
     max-width: 350px;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
-    from { transform: scale(0.8); opacity: 0; }
+    from { transform: scale(0.85); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
 
@@ -111,13 +120,13 @@ button {
 <body>
 
 <h1>Imposter Party</h1>
-<p>enter player names</p>
 
 <div class="card">
-    <input type="text" placeholder="Player 1">
-    <input type="text" placeholder="Player 2">
-    <input type="text" placeholder="Player 3">
-    <input type="text" placeholder="Player 4">
+    <div id="playerInputs"></div>
+
+    <button class="secondary" onclick="addPlayer()">Add Player</button>
+    <button class="danger" onclick="removePlayer()">Remove Player</button>
+    <br>
     <button class="primary" onclick="startGame()">Start Game</button>
     <button onclick="resetGame()">Reset</button>
 </div>
@@ -133,18 +142,34 @@ button {
 
 <script>
 const words = [
-    "Pizza", "Beach", "Tiger", "School", 
-    "Airplane", "Zombie", "Castle", 
-    "iPhone", "Basketball", "Prison"
+    "Pizza","Beach","Tiger","School",
+    "Airplane","Zombie","Castle",
+    "iPhone","Basketball","Prison"
 ];
 
 let roles = [];
 let revealed = [];
 let currentPlayer = null;
 let names = [];
+let playerCount = 0;
+
+function addPlayer() {
+    playerCount++;
+    const input = document.createElement("input");
+    input.placeholder = "Player " + playerCount;
+    document.getElementById("playerInputs").appendChild(input);
+}
+
+function removePlayer() {
+    const container = document.getElementById("playerInputs");
+    if (container.lastChild) {
+        container.removeChild(container.lastChild);
+        playerCount--;
+    }
+}
 
 function startGame() {
-    const inputs = document.querySelectorAll("input");
+    const inputs = document.querySelectorAll("#playerInputs input");
     names = [];
     roles = [];
     revealed = [];
@@ -179,12 +204,12 @@ function startGame() {
         const btn = document.createElement("button");
         btn.textContent = name;
         btn.className = "playerBtn";
-        btn.onclick = () => revealRole(i, btn);
+        btn.onclick = () => revealRole(i);
         container.appendChild(btn);
     });
 }
 
-function revealRole(index, button) {
+function revealRole(index) {
     if (revealed[index]) return;
     currentPlayer = index;
     document.getElementById("roleText").textContent = roles[index];
@@ -206,6 +231,8 @@ function resetGame() {
     names = [];
     document.getElementById("playerButtons").innerHTML = "";
 }
+addPlayer();
+addPlayer();
 </script>
 
 </body>
