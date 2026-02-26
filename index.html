@@ -3,127 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pass The Phone - Imposter Game</title>
+<title>Imposter Party</title>
+
 <style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #111;
+    margin: 0;
+    background: linear-gradient(135deg, #1e1e2f, #111);
     color: white;
     text-align: center;
-    margin: 0;
     padding: 20px;
 }
 
 h1 {
-    margin-bottom: 10px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    text-align: center;
 }
 
 button {
     padding: 12px 18px;
     margin: 6px;
+    border-radius: 12px;
     border: none;
-    border-radius: 10px;
-    background: #2e86ff;
-    color: white;
-    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
-button:disabled {
-    background: #555;
-    cursor: not-allowed;
+.primary {
+    background: #5865f2;
+    color: white;
+}
+
+.primary:hover {
+    transform: scale(1.05);
+}
+
+.playerBtn {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+}
+
+.playerBtn:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.playerBtn:disabled {
+    background: rgba(255,255,255,0.03);
+    opacity: 0.5;
 }
 
 #rolePopup {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.85);
     display: none;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
 }
 
 .popupContent {
-    background: #222;
-    padding: 30px;
-    border-radius: 15px;
+    background: #181828;
+    padding: 40px;
+    border-radius: 25px;
+    width: 80%;
+    max-width: 350px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .closeBtn {
-    margin-top: 20px;
     background: crimson;
-}
-
-input {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    margin-bottom: 10px;
-    text-align: center;
+    margin-top: 20px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>Pass The Phone</h1>
+<h1>Imposter Party</h1>
+<p>enter player names</p>
 
-<p>How many players?</p>
-<input type="number" id="playerCount" min="2" max="10" value="4">
-<br>
-<button onclick="startGame()">Start Game</button>
-<button onclick="resetGame()">Reset</button>
+<div class="card">
+    <input type="text" placeholder="Player 1">
+    <input type="text" placeholder="Player 2">
+    <input type="text" placeholder="Player 3">
+    <input type="text" placeholder="Player 4">
+    <button class="primary" onclick="startGame()">Start Game</button>
+    <button onclick="resetGame()">Reset</button>
+</div>
 
-<div id="playerButtons"></div>
+<div class="card" id="playerButtons"></div>
 
 <div id="rolePopup">
     <div class="popupContent">
         <h2 id="roleText"></h2>
-        <button class="closeBtn" onclick="closeRole()">X Close</button>
+        <button class="closeBtn" onclick="closeRole()">Close</button>
     </div>
 </div>
 
 <script>
 const words = [
-    "Pizza", "Beach", "Tiger", "School", "Jail",
-    "Airplane", "Zombie", "Castle", "iPhone", "Basketball"
+    "Pizza", "Beach", "Tiger", "School", 
+    "Airplane", "Zombie", "Castle", 
+    "iPhone", "Basketball", "Prison"
 ];
 
 let roles = [];
 let revealed = [];
 let currentPlayer = null;
+let names = [];
 
 function startGame() {
-    const count = parseInt(document.getElementById("playerCount").value);
-    const container = document.getElementById("playerButtons");
-    container.innerHTML = "";
-
+    const inputs = document.querySelectorAll("input");
+    names = [];
     roles = [];
     revealed = [];
 
-    const randomWord = words[Math.floor(Math.random() * words.length)];
-    const imposterIndex = Math.floor(Math.random() * count);
+    inputs.forEach(input => {
+        if (input.value.trim() !== "") {
+            names.push(input.value.trim());
+        }
+    });
 
-    for (let i = 0; i < count; i++) {
+    if (names.length < 2) {
+        alert("need at least 2 players");
+        return;
+    }
+
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    const imposterIndex = Math.floor(Math.random() * names.length);
+
+    names.forEach((name, i) => {
         if (i === imposterIndex) {
-            roles.push("IMPOSTER 😈");
+            roles.push("😈 you are the IMPOSTER");
         } else {
-            roles.push("Word: " + randomWord);
+            roles.push("🟢 word: " + randomWord);
         }
         revealed.push(false);
-    }
+    });
 
-    for (let i = 0; i < count; i++) {
+    const container = document.getElementById("playerButtons");
+    container.innerHTML = "";
+
+    names.forEach((name, i) => {
         const btn = document.createElement("button");
-        btn.textContent = "Player " + (i + 1);
+        btn.textContent = name;
+        btn.className = "playerBtn";
         btn.onclick = () => revealRole(i, btn);
         container.appendChild(btn);
-    }
+    });
 }
 
 function revealRole(index, button) {
     if (revealed[index]) return;
-
     currentPlayer = index;
     document.getElementById("roleText").textContent = roles[index];
     document.getElementById("rolePopup").style.display = "flex";
@@ -132,7 +194,7 @@ function revealRole(index, button) {
 function closeRole() {
     if (currentPlayer !== null) {
         revealed[currentPlayer] = true;
-        document.querySelectorAll("#playerButtons button")[currentPlayer].disabled = true;
+        document.querySelectorAll(".playerBtn")[currentPlayer].disabled = true;
     }
     document.getElementById("rolePopup").style.display = "none";
 }
@@ -141,6 +203,7 @@ function resetGame() {
     roles = [];
     revealed = [];
     currentPlayer = null;
+    names = [];
     document.getElementById("playerButtons").innerHTML = "";
 }
 </script>
